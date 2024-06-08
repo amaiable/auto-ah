@@ -46,13 +46,13 @@ def get_formatted_spirit_item_data() -> str:
     output_string = "---------------------------------------\n"
     output_string += "Spirit Item BZ Data\n"
     output_string += "---------------------------------------\n"
-    output_string += "Spirit Wing\n"
+    output_string += "Spirit Bone\n"
     output_string += "---------------------------------------\n"
 
     output_string += f"Bid: {spirit_bone_prices['bid']} / Ask: {spirit_bone_prices['ask']}\n"
 
     output_string += "---------------------------------------\n"
-    output_string += "Spirit Bone\n"
+    output_string += "Spirit Wing\n"
     output_string += "---------------------------------------\n"
 
     output_string += f"Bid: {spirit_wing_prices['bid']} / Ask: {spirit_wing_prices['ask']}\n"
