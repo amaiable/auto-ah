@@ -1,6 +1,6 @@
 from api_utils import make_get_request
 from threading import Lock, Thread
-from typing import List
+from typing import List, Dict
 
 class AuctionHouseUtil:
     def __init__(self, api_key: str):
@@ -40,4 +40,23 @@ class AuctionHouseUtil:
         
         return player_ah_data["auctions"]
 
-    def get_auctions_by_item_name(self, item_name: str, )
+    def get_auctions_by_item_name(self, item_name: str, bin_flag: bool = True, modifiers: List[str] = []) -> List[any]:
+        item_name = item_name.lower()
+        modifiers = [modifier.lower() for modifier in modifiers]
+
+        active_auctions = self.get_active_auctions()
+
+        def item_name_filter(auction: Dict[any, any]) -> bool:
+            lower_auction_item_name = auction["item_name"].lower()
+            return item_name in lower_auction_item_name
+
+        def modifier_filter(auction: Dict[any, any]) -> bool:
+            lower_auction_item_name = auction["item_name"].lower()
+            lower_auction_item_lore = auction["item_lore"].lower()
+            lower_auction_tier = auction["tier"].lower()
+            for modifier in modifiers:
+                if modifier not in lower_auction_item_name and modifier not in lower_auction_item_lore and modifier not in lower_auction_tier:
+                    return False
+            return True
+
+        return [auction for auction in active_auctions if item_name_filter(auction) and modifier_filter(auction) and auction["bin"] == bin_flag]
