@@ -1,25 +1,29 @@
 from functools import cache
 from heapq import heappush, heappop
+from typing import Dict, List
 
 from api_utils import make_get_request
 
 BAZAAR_ENDPOINT = "https://api.hypixel.net/v2/skyblock/bazaar"
 
 class BazaarUtil:
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-
+    def __init__(self):
         self.bazaar_data = {}
         self.bazaar_produtcs = []
         self.bazaar_item_names = set()
         self.refresh_bazaar_data()
+
+    def transform_query(self, query: str) -> str:
+        query = query.upper()
+        query = query.replace(" ", "_")
+        return query
 
     def refresh_bazaar_data(self) -> None:
         self.bazaar_data = make_get_request(BAZAAR_ENDPOINT)
         self.bazaar_products = self.bazaar_data["products"]
         self.bazaar_item_names = set(self.bazaar_products.keys())
 
-    def search_item_names(self, query: str, num_results: int = 5) -> List[str]:
+    def search_item_names(self, query: str, num_results: int = 20) -> List[str]:
         """
         Uses edit distance DP algorithm to find the num_results items with the most similar name
         TODO: edit distance might not be the best algorithm for this, as it may favor shorter (but incorrect) names
@@ -39,24 +43,26 @@ class BazaarUtil:
 
             return solve(0, 0)
 
-        query = query.lower()
+        # Cleaning query to be consistent with the styling of the names that the API returns
+        query = self.transform_query(query)
 
         word_distances = []
 
         for item_name in self.bazaar_item_names:
-            item_name = item_name.lower()
             word_distance = edit_distance(query, item_name)
 
             if word_distance == 0:
                 return [item_name]
 
             heappush(word_distances, (-word_distance, item_name))
-            if len(results) > k:
+            if len(word_distances) > num_results:
                 heappop(word_distances)
 
         return [item_name for _, item_name in word_distances]
 
     def get_item_prices(self, query: str) -> Dict[str, float]:
+
+        query = self.transform_query(query)
 
         if query not in self.bazaar_item_names:
             raise KeyError(f"Cannot find item: '{query}'. Perhaps you meant one of {self.search_item_names(query)}")
@@ -69,6 +75,8 @@ class BazaarUtil:
         return {"bid": bid_price, "ask": ask_price}
 
     def get_item_top_order_data(self, query: str) -> Dict[str, List[Dict[str, float]]]:
+
+        query = self.transform_query(query)
 
         if query not in self.bazaar_item_names:
             raise KeyError(f"Cannot find item: '{query}'. Perhaps you meant one of {self.search_item_names(query)}")

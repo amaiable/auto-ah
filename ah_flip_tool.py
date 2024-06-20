@@ -71,7 +71,7 @@ def get_formatted_auction_data() -> str:
 
     output_string += "---------------------------------------\n"
 
-    output_string += f"{DEFAULT_NUM_AUCTION_SLOTS - active_auction_count} auction house slots available\n"
+    output_string += f"{DEFAULT_NUM_AUCTION_SLOTS - active_auction_count} auction house {'slots' if DEFAULT_NUM_AUCTION_SLOTS - active_auction_count != 1 else 'slot'} available\n"
     output_string += "---------------------------------------\n"
 
     return output_string
