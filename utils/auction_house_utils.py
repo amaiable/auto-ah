@@ -2,6 +2,8 @@ from api_utils import make_get_request
 from threading import Lock, Thread
 from typing import List, Dict
 
+RELEVANT_MODIFIER_KEYS = ["item_name", "item_lore", "tier"]
+
 class AuctionHouseUtil:
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -51,11 +53,13 @@ class AuctionHouseUtil:
             return item_name in lower_auction_item_name
 
         def modifier_filter(auction: Dict[any, any]) -> bool:
-            lower_auction_item_name = auction["item_name"].lower()
-            lower_auction_item_lore = auction["item_lore"].lower()
-            lower_auction_tier = auction["tier"].lower()
+            lower_modifiers = {modifier_key: auction[modifier_key].lower() for modifier_key in RELEVANT_MODIFIER_KEYS}
+
             for modifier in modifiers:
-                if modifier not in lower_auction_item_name and modifier not in lower_auction_item_lore and modifier not in lower_auction_tier:
+                for lower_modifier in lower_modifiers.values():
+                    if modifier in lower_modifier:
+                        break
+                else:
                     return False
             return True
 
