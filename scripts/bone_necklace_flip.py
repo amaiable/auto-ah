@@ -6,6 +6,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils')))
 from bazaar_utils import BazaarUtil
 from auction_house_utils import AuctionHouseUtil
+from notif_utils import send_notification
 
 INSTANT_FLAG = False
 
@@ -34,7 +35,10 @@ def main():
     min_listing = min(curr_listings, key=lambda x: x["starting_bid"])
     curr_min_price = min_listing["starting_bid"]
 
-    print("PROFIT EXCLUDING TAX IS",  curr_min_price - buy_all_price)
+    message = f"Current flip profit excluding tax: {curr_min_price - buy_all_price}"
+    print(message)
+    send_notification(message)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "INSTANT":
